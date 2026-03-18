@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghidra-mcp"
+version = "4.3.0"
+description = "Model Context Protocol bridge for Ghidra reverse engineering workflows"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+keywords = ["ghidra", "mcp", "reverse-engineering"]
+dependencies = [
+    "mcp>=1.5.0,<2.0.0",
+    "requests>=2.28.0,<3.0.0",
+]
+
+[project.optional-dependencies]
+knowledge-db = [
+    "psycopg2-binary>=2.9,<3.0.0",
+]
+
+[project.scripts]
+ghidra-mcp = "ghidra_mcp_cli:main"
+bridge_mcp_ghidra = "ghidra_mcp_cli:main"
+"bridge_mcp_ghidra.py" = "ghidra_mcp_cli:main"
+
+[project.urls]
+Homepage = "https://github.com/bethington/ghidra-mcp"
+Repository = "https://github.com/bethington/ghidra-mcp"
+Issues = "https://github.com/bethington/ghidra-mcp/issues"
+
+[dependency-groups]
+test = [
+    "aiohttp>=3.8.0",
+    "black>=22.0.0",
+    "coverage>=7.0.0",
+    "flake8>=5.0.0",
+    "isort>=5.10.0",
+    "mypy>=1.0.0",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-html>=3.1.0",
+    "pytest-json-report>=1.5.0",
+    "pytest-mock>=3.10.0",
+    "pytest-pdb>=0.2.0",
+    "pytest-picked>=0.4.6",
+    "pytest-timeout>=2.1.0",
+    "pytest-xdist>=3.0.0",
+    "pyyaml>=6.0.0",
+    "requests-mock>=1.10.0",
+    "responses>=0.22.0",
+    "types-requests>=2.28.0",
+]
+
+[tool.setuptools]
+py-modules = ["bridge_mcp_ghidra", "ghidra_mcp_cli"]

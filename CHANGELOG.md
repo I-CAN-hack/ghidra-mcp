@@ -29,6 +29,15 @@ Complete version history for the Ghidra MCP Server project.
 - Tests cover: schema type mapping, default conversion, handler creation, parameter routing, static tool availability
 - Updated endpoint count assertions for static-only decorator count (15-50 range)
 
+### Python Packaging & uvx
+
+- Added `pyproject.toml` with uv-compatible packaging metadata for the Python bridge
+- Added console scripts for `ghidra-mcp`, `bridge_mcp_ghidra`, and `bridge_mcp_ghidra.py`
+- Added a `test` dependency group for `uv sync --group test`
+- Added an optional `knowledge-db` extra for PostgreSQL-backed knowledge tools
+- Updated example MCP configs and README usage to run the bridge via `uvx --from git+https://github.com/bethington/ghidra-mcp`
+- Removed the inline PEP 723 dependency block from `bridge_mcp_ghidra.py` so `pyproject.toml` is the packaging source of truth
+
 ### Bug Fixes & Compatibility
 
 - **Fixed POST endpoint data format** (#66): `safe_post()` was sending form-urlencoded data while the Java server expected JSON. Changed to send `json=data` instead of `data=data`, fixing `rename_function_by_address` and all other POST-based endpoints.

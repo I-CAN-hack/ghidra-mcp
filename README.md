@@ -160,12 +160,23 @@ Most Ghidra MCP implementations give you a handful of read-only tools and call i
 
 ### Basic Usage
 
-#### Option 1: Stdio Transport (Recommended for AI tools)
+#### Option 1: Run Directly From Git With `uvx`
+```bash
+uvx --from git+https://github.com/bethington/ghidra-mcp bridge_mcp_ghidra.py
+```
+
+If you want the optional knowledge DB tools enabled in the same one-shot invocation:
+
+```bash
+uvx --from git+https://github.com/bethington/ghidra-mcp --extra knowledge-db bridge_mcp_ghidra.py
+```
+
+#### Option 2: Stdio Transport (Recommended for local checkouts)
 ```bash
 python bridge_mcp_ghidra.py
 ```
 
-#### Option 2: SSE Transport (Web/HTTP clients)
+#### Option 3: SSE Transport (Web/HTTP clients)
 ```bash
 python bridge_mcp_ghidra.py --transport sse --mcp-host 127.0.0.1 --mcp-port 8081
 ```

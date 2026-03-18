@@ -1,12 +1,3 @@
-# /// script
-# requires-python = ">=3.10"
-# dependencies = [
-#     "requests>=2,<3",
-#     "mcp>=1.2.0,<2",
-#     "psycopg2-binary>=2.9,<3",
-# ]
-# ///
-
 import requests
 import argparse
 import logging

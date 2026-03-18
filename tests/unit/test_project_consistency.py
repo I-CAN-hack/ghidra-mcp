@@ -42,6 +42,7 @@ ENDPOINTS_JSON = PROJECT_ROOT / "tests" / "endpoints.json"
 CLAUDE_MD = PROJECT_ROOT / "CLAUDE.md"
 README_MD = PROJECT_ROOT / "README.md"
 AGENTS_MD = PROJECT_ROOT / "AGENTS.md"
+PYPROJECT_TOML = PROJECT_ROOT / "pyproject.toml"
 SETUP_PS1 = PROJECT_ROOT / "ghidra-mcp-setup.ps1"
 EXT_PROPERTIES = PROJECT_ROOT / "src" / "main" / "resources" / "extension.properties"
 VER_PROPERTIES = PROJECT_ROOT / "src" / "main" / "resources" / "version.properties"
@@ -196,6 +197,13 @@ class TestVersionConsistency:
         assert (
             f"**Version**: {self.version}" in content
         ), f"AGENTS.md missing '**Version**: {self.version}'"
+
+    def test_pyproject_version(self):
+        """pyproject.toml version should match pom.xml."""
+        content = PYPROJECT_TOML.read_text(encoding="utf-8")
+        assert (
+            f'version = "{self.version}"' in content
+        ), f"pyproject.toml missing 'version = \"{self.version}\"'"
 
     def test_setup_script_version(self):
         """ghidra-mcp-setup.ps1 $PluginVersion should match pom.xml."""
@@ -363,6 +371,13 @@ class TestBridgeConfiguration:
         assert (
             result.returncode == 0
         ), f"bridge_mcp_ghidra.py import failed:\n{result.stderr}"
+
+    def test_pyproject_exposes_bridge_console_script(self):
+        """pyproject.toml should expose the bridge as a console script for uvx."""
+        content = PYPROJECT_TOML.read_text(encoding="utf-8")
+        assert (
+            '"bridge_mcp_ghidra.py" = "ghidra_mcp_cli:main"' in content
+        ), "pyproject.toml missing bridge_mcp_ghidra.py console script entry"
 
     def test_all_mcp_tools_have_docstrings(self):
         """Every @mcp.tool() function should have a docstring."""
