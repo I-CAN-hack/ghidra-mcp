@@ -1,0 +1,22 @@
+version = "0.2.0"
+
+def ghidraInstallDir = System.getenv("GHIDRA_INSTALL_DIR") ?: project.findProperty("GHIDRA_INSTALL_DIR")
+
+if (!ghidraInstallDir) {
+	throw new GradleException("Set GHIDRA_INSTALL_DIR or pass -PGHIDRA_INSTALL_DIR=/path/to/ghidra")
+}
+
+apply from: new File(ghidraInstallDir).getCanonicalPath() + "/support/buildExtension.gradle"
+
+tasks.named("processResources") {
+	from("../ghidra_mcp/tools/core/execute_wrapper.py") {
+		into "ghidramcp"
+	}
+}
+
+tasks.named("buildExtension") {
+	exclude ".cache/**"
+	exclude ".github/**"
+	exclude ".venv/**"
+	exclude "ghidra_*_PUBLIC/**"
+}

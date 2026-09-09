@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ghidra": {
+      "command": "uv",
+      "args": ["run", "ghidra-mcp"]
+    }
+  }
+}

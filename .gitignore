@@ -1,0 +1,14 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.gradle/
+
+# Virtual environments
+.venv
+.codex/*
+!.codex/
+!.codex/config.toml
