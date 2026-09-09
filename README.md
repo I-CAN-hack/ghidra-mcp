@@ -52,7 +52,7 @@ Ghidra must be launched with PyGhidra support:
 For Codex, add the server globally:
 
 ```bash
-codex mcp add ghidra -- uvx --from git+ssh://git@github.com/I-CAN-hack/ghidra-mcp.git ghidra-mcp
+codex mcp add ghidra -- uvx --from git+https://github.com/I-CAN-hack/ghidra-mcp.git ghidra-mcp
 ```
 
 For other MCP clients, use an equivalent configuration, for example:
@@ -64,7 +64,7 @@ For other MCP clients, use an equivalent configuration, for example:
       "command": "uvx",
       "args": [
         "--from",
-        "git+ssh://git@github.com/I-CAN-hack/ghidra-mcp.git",
+        "git+https://github.com/I-CAN-hack/ghidra-mcp.git",
         "ghidra-mcp"
       ]
     }
