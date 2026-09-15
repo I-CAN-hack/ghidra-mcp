@@ -1,0 +1,117 @@
+name: Build Ghidra extension
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GHIDRA_ARCHIVE: ghidra_12.1.2_PUBLIC_20260605.zip
+  GHIDRA_DOWNLOAD_URL: https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.2_build/ghidra_12.1.2_PUBLIC_20260605.zip
+  GHIDRA_SHA256: b62e81a0390618466c019c60d8c2f796ced2509c4c1aea4a37644a77272cf99d
+
+jobs:
+  build:
+    name: Build extension ZIP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Download Ghidra
+        shell: bash
+        run: |
+          ghidra_work_dir="$RUNNER_TEMP/ghidra"
+          mkdir -p "$ghidra_work_dir"
+
+          curl --location --fail --retry 3 --retry-all-errors \
+            --output "$ghidra_work_dir/$GHIDRA_ARCHIVE" \
+            "$GHIDRA_DOWNLOAD_URL"
+          echo "$GHIDRA_SHA256  $ghidra_work_dir/$GHIDRA_ARCHIVE" | sha256sum --check --strict
+          unzip -q "$ghidra_work_dir/$GHIDRA_ARCHIVE" -d "$ghidra_work_dir"
+
+          echo "GHIDRA_INSTALL_DIR=$ghidra_work_dir/ghidra_12.1.2_PUBLIC" >> "$GITHUB_ENV"
+
+      - name: Build extension
+        run: ./ghidra_extension/build.sh "$GHIDRA_INSTALL_DIR" clean buildExtension
+
+      - name: Verify and stage extension ZIP
+        id: package
+        shell: bash
+        run: |
+          shopt -s nullglob
+          archives=(ghidra_extension/dist/*.zip)
+
+          if (( ${#archives[@]} != 1 )); then
+            echo "Expected exactly one extension ZIP, found ${#archives[@]}" >&2
+            exit 1
+          fi
+
+          archive="${archives[0]}"
+          unzip -t "$archive"
+          unzip -Z1 "$archive" "ghidra-mcp/extension.properties"
+          unzip -Z1 "$archive" "ghidra-mcp/Module.manifest"
+          unzip -Z1 "$archive" "ghidra-mcp/lib/*.jar"
+
+          mkdir -p release
+          cp "$archive" release/ghidra-mcp.zip
+
+      - name: Upload extension ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghidra-mcp-${{ github.sha }}
+          path: release/ghidra-mcp.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish GitHub release
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download extension ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: ghidra-mcp-${{ github.sha }}
+          path: release
+
+      - name: Add tag to asset name
+        id: package
+        shell: bash
+        run: |
+          safe_tag="${GITHUB_REF_NAME//\//-}"
+          asset="release/ghidra-mcp-$safe_tag.zip"
+          mv release/ghidra-mcp.zip "$asset"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+
+      - name: Create release and upload extension ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ASSET: ${{ steps.package.outputs.asset }}
+        shell: bash
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$RELEASE_ASSET" \
+              --clobber \
+              --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" "$RELEASE_ASSET" \
+              --generate-notes \
+              --title "$GITHUB_REF_NAME" \
+              --repo "$GITHUB_REPOSITORY"
+          fi

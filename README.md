@@ -28,6 +28,17 @@ Standalone builds require JDK 21. Build the extension ZIP with:
 
 The result is written to `ghidra_extension/dist/`.
 
+### Install a release
+
+Download `ghidra-mcp-<tag>.zip` from the
+[GitHub Releases page](https://github.com/I-CAN-hack/ghidra-mcp/releases). In
+Ghidra, open `File -> Install Extensions...`, click the `+` button, and select
+the downloaded ZIP without extracting it. Restart Ghidra after installation.
+
+Every pushed tag creates a GitHub Release with an Extension Manager-compatible
+ZIP attached. Regular pushes and pull requests also build the ZIP as a workflow
+artifact for testing.
+
 ### Install and enable the plugin
 
 For local development, build and install the extension into your Ghidra user
